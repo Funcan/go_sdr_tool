@@ -44,7 +44,6 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	}
 	filenamebox.Connect("activate", func(e interface{}) {
 		filename, _ := filenamebox.GetText()
-		log.Printf("newFilename = %s", filename)
 		loadFileSender(filename)
 	})
 
@@ -54,7 +53,6 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	}
 	loadbutton.Connect("clicked", func() {
 		filename, _ := filenamebox.GetText()
-		log.Printf("newFilename = %s", filename)
 		processingSteps = make([]func([]float64)[]float64, 0)
 		loadFileSender(filename)
 	})
@@ -97,7 +95,6 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	}
 
 	adjustment.Connect("value-changed", func() {
-		log.Printf("Slider changed")
 		chartarea.QueueDraw()
 	})
 
@@ -234,7 +231,6 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 }
 
 func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustment *gtk.Adjustment, zoom int, processingsteps []func([]float64)[]float64) {
-	log.Printf("draw(%d) %d", len(data), zoom)
 	width := da.GetAllocatedWidth()
 	height := da.GetAllocatedHeight()
 
@@ -251,8 +247,6 @@ func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustm
 	}
 
 	max := mathtools.Max(data)
-
-	log.Printf("Width: %d x %d %d", width, height, start)
 
 	cr.SetSourceRGBA(1,0,0,1)
 	cr.SetLineWidth(0.6)

@@ -2,6 +2,9 @@ package mathtools
 
 import (
 	"math"
+
+	"gonum.org/v1/gonum/floats"
+	"gonum.org/v1/gonum/stat"
 )
 
 // Centered rolling average
@@ -36,33 +39,15 @@ func Mod(d, m int) int {
 }
 
 func Sum(in []float64) float64 {
-	sum := float64(0)
-
-	for i := range in {
-		sum += in[i]
-	}
-
-	return sum
+	return floats.Sum(in)
 }
 
 func Min(in []float64) float64 {
-	min := in[0]
-	for _, d := range(in) {
-		if d < min {
-			min = d
-		}
-	}
-	return min
+	return floats.Min(in)
 }
 
 func Max(in []float64) float64 {
-	max := in[0]
-	for _, d := range(in) {
-		if d > max {
-			max = d
-		}
-	}
-	return max
+	return floats.Max(in)
 }
 
 func Histogram(in []float64, nBuckets int) []int {
@@ -83,19 +68,11 @@ func Histogram(in []float64, nBuckets int) []int {
 }
 
 func Mean(in []float64) float64 {
-	return Sum(in) / float64(len(in))
+	return stat.Mean(in, nil)
 }
 
 func StdDev(in []float64) float64 {
-	mean := Mean(in)
-
-	sd := float64(0)
-	for _, d := range(in) {
-		sd += math.Pow(d - mean, 2)
-	}
-	sd = math.Sqrt(sd/float64(len(in)))
-
-	return sd
+	return stat.StdDev(in, nil)
 }
 
 // squelch will zero all values less than floor

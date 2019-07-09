@@ -2,3 +2,8 @@ github.com/gotk3/gotk3 v0.0.0-20190620081259-6dcdf9e5c51e h1:KFy3swDjmbaSAE6b1iE
 github.com/gotk3/gotk3 v0.0.0-20190620081259-6dcdf9e5c51e/go.mod h1:Eew3QBwAOBTrfFFDmsDE5wZWbcagBL1NUslj1GhRveo=
 github.com/pothosware/go-soapy-sdr v0.7.4 h1:XD50d6sqOZbBfC/lH74XbRxMykn6u1IR96RbKvCHGAQ=
 github.com/pothosware/go-soapy-sdr v0.7.4/go.mod h1:tf1v8hvPJ8WyoGnPZQYvcDq/5qXgMFwd/g1x5xiacPY=
+golang.org/x/exp v0.0.0-20190125153040-c74c464bbbf2/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
+golang.org/x/tools v0.0.0-20190206041539-40960b6deb8e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+gonum.org/v1/gonum v0.0.0-20190704103327-70ddf0df3d53 h1:ey6JgTDZ1Qi8fSrnhR1bvtHfpbi0ngrhpBlMEOEXVYs=
+gonum.org/v1/gonum v0.0.0-20190704103327-70ddf0df3d53/go.mod h1:03dgh78c4UvU1WksguQ/lvJQXbezKQGJSrwwRq5MraQ=
+gonum.org/v1/netlib v0.0.0-20190313105609-8cb42192e0e0/go.mod h1:wa6Ws7BG/ESfp6dHfk7C6KdzKA7wR7u/rKwOGE66zvw=
