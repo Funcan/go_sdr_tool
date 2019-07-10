@@ -15,52 +15,39 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 
 	// Create a new toplevel window, set its title, and connect it to the
 	// "destroy" signal to exit the GTK main loop when it is destroyed.
-	win, err := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
-	if err != nil {
-		log.Fatal("Unable to create window:", err)
-	}
+	win, _ := gtk.WindowNew(gtk.WINDOW_TOPLEVEL)
 	win.SetTitle("Analyser")
 	win.Connect("destroy", func() {
 		gtk.MainQuit()
 	})
 
-	pagegrid, err := gtk.GridNew()
-	if err != nil {
-                log.Fatal("Unable to create page grid:", err)
-        }
+	pagegrid, _ := gtk.GridNew()
 	pagegrid.SetOrientation(gtk.ORIENTATION_VERTICAL)
 
-	l, err := gtk.LabelNew("Filename: ")
-	if err != nil {
-		log.Fatal("Unable to create label:", err)
-	}
+	l, _ := gtk.LabelNew("Filename: ")
 
 	loadFileSender := registerSource("load file")
 	processingSteps := make([]func([]float64)[]float64, 0)
 
-	filenamebox, err := gtk.EntryNew()
-	if err != nil {
-		log.Fatal("Unable to create filenamebox:", err)
-	}
+	processbox, _ := gtk.BoxNew(gtk.ORIENTATION_HORIZONTAL, 2)
+
+	clearbutton, _ := gtk.ButtonNewWithLabel("X")
+	processbox.Add(clearbutton)
+
+	filenamebox, _ := gtk.EntryNew()
 	filenamebox.Connect("activate", func(e interface{}) {
 		filename, _ := filenamebox.GetText()
 		loadFileSender(filename)
 	})
 
-	loadbutton, err := gtk.ButtonNewWithLabel("Load")
-	if err != nil {
-		log.Fatal("Unable to create filenamebox:", err)
-	}
+	loadbutton, _ := gtk.ButtonNewWithLabel("Load")
 	loadbutton.Connect("clicked", func() {
 		filename, _ := filenamebox.GetText()
 		processingSteps = make([]func([]float64)[]float64, 0)
 		loadFileSender(filename)
 	})
 
-	loadgrid, err := gtk.GridNew()
-	if err != nil {
-		log.Fatal("Unable to create grid:", err)
-	}
+	loadgrid, _ := gtk.GridNew()
 	loadgrid.SetOrientation(gtk.ORIENTATION_HORIZONTAL)
 	loadgrid.Add(l)
 	loadgrid.Add(filenamebox)
@@ -68,10 +55,7 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 
 	pagegrid.Add(loadgrid)
 
-	chartarea, err := gtk.DrawingAreaNew()
-	if err != nil {
-		log.Fatal("Unable to create drawing area:", err)
-	}
+	chartarea, _ := gtk.DrawingAreaNew()
 
 	var dataPtr *[]float64
 
@@ -89,11 +73,7 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	chartarea.SetHExpand(true)
 	chartarea.SetVExpand(true)
 
-	adjustment, err := gtk.AdjustmentNew(0, 0, 1, 1, 1, 1)
-	if err != nil {
-		log.Fatal("Unable to create adjustment:", err)
-	}
-
+	adjustment, _ := gtk.AdjustmentNew(0, 0, 1, 1, 1, 1)
 	adjustment.Connect("value-changed", func() {
 		chartarea.QueueDraw()
 	})
@@ -107,10 +87,7 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 		adjustment.Configure(0, 0, float64(len(data)), 10, 1, 100)
 	})
 
-	scrollbar, err := gtk.ScrollbarNew(gtk.ORIENTATION_HORIZONTAL, adjustment)
-	if err != nil {
-		log.Fatal("Unable to create scrollbar:", err)
-	}
+	scrollbar, _ := gtk.ScrollbarNew(gtk.ORIENTATION_HORIZONTAL, adjustment)
 	scrollbar.SetHExpand(true)
 	pagegrid.Add(scrollbar)
 
@@ -122,17 +99,10 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 		}
 	})
 
-
-	controlsgrid, err := gtk.GridNew()
-	if err != nil {
-		log.Fatal("Unable to create controls grid:", err)
-	}
+	controlsgrid, _ := gtk.GridNew()
 	controlsgrid.SetOrientation(gtk.ORIENTATION_HORIZONTAL)
 
-	zoombutton, err := gtk.SpinButtonNewWithRange(1, 10, 1);
-	if err != nil {
-		log.Fatal("Unable to create zoom button:", err)
-	}
+	zoombutton, _ := gtk.SpinButtonNewWithRange(1, 10, 1);
 	zoombutton.Connect("value-changed", func() {
 		zoom = zoombutton.GetValueAsInt()
 		chartarea.QueueDraw()
@@ -140,87 +110,74 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 
 	controlsgrid.Add(zoombutton)
 
-	absButton, err := gtk.ButtonNewWithLabel("Abs Around Mean")
-	if err != nil {
-                log.Fatal("Unable to create abs button")
-	}
+	absButton, _ := gtk.ButtonNewWithLabel("Abs Around Mean")
 
 	absButton.Connect("clicked", func() {
 		processingSteps = append(processingSteps, func(in []float64)[]float64 {
 			return mathtools.AbsAroundMean(in)
 		})
+		stepbutton, _ := gtk.ButtonNewWithLabel("abs mean")
+		processbox.Add(stepbutton)
 		chartarea.QueueDraw()
+		win.ShowAll()
 	})
 	controlsgrid.Add(absButton)
 
 	// FIXME: Make floor adjustable
-	squelchButton, err := gtk.ButtonNewWithLabel("Squelch")
-	if err != nil {
-		log.Fatal("Unable to create squelch button")
-	}
+	squelchButton, _ := gtk.ButtonNewWithLabel("Squelch")
 	squelchButton.Connect("clicked", func() {
                 processingSteps = append(processingSteps, func(in []float64)[]float64 {
                         return mathtools.Squelch(in, mathtools.StdDev(in)*2)
 		})
+		stepbutton, _ := gtk.ButtonNewWithLabel("squech")
+		processbox.Add(stepbutton)
 		chartarea.QueueDraw()
+		win.ShowAll()
 	})
 	controlsgrid.Add(squelchButton)
 
-	denoiseButton, err := gtk.ButtonNewWithLabel("Denoise")
-	if err != nil {
-                log.Fatal("Unable to create denoise button")
-	}
+	denoiseButton, _ := gtk.ButtonNewWithLabel("Denoise")
 	denoiseButton.Connect("clicked", func() {
                 processingSteps = append(processingSteps, func(in []float64)[]float64 {
                         return mathtools.Denoise(in)
                 })
+		stepbutton, _ := gtk.ButtonNewWithLabel("denoise")
+		processbox.Add(stepbutton)
                 chartarea.QueueDraw()
+		win.ShowAll()
         })
 	controlsgrid.Add(denoiseButton)
 
 	// FIXME: Make buckets adjustable
-	rollingAvgButton, err := gtk.ButtonNewWithLabel("Rolling Average")
-	if err != nil {
-                log.Fatal("Unable to create rolling avg button")
-	}
+	rollingAvgButton, _ := gtk.ButtonNewWithLabel("Rolling Average")
 
 	rollingAvgButton.Connect("clicked", func() {
                 processingSteps = append(processingSteps, func(in []float64)[]float64 {
                         return mathtools.RollingAverage(in, 5)
                 })
+		stepbutton, _ := gtk.ButtonNewWithLabel("rolling avg")
+		processbox.Add(stepbutton)
                 chartarea.QueueDraw()
+		win.ShowAll()
         })
 	controlsgrid.Add(rollingAvgButton)
 
 	// FIXME: Make buckets adjustable
-	edgeFinderButton, err := gtk.ButtonNewWithLabel("Edge finder")
-	if err != nil {
-                log.Fatal("Unable to create edge finder button")
-	}
+	edgeFinderButton, _ := gtk.ButtonNewWithLabel("Edge finder")
 
 	edgeFinderButton.Connect("clicked", func() {
                 processingSteps = append(processingSteps, func(in []float64)[]float64 {
                         return mathtools.EdgeFinder(in, 5)
                 })
+		stepbutton, _ := gtk.ButtonNewWithLabel("edge")
+		processbox.Add(stepbutton)
                 chartarea.QueueDraw()
+		win.ShowAll()
         })
 	controlsgrid.Add(edgeFinderButton)
 
 	pagegrid.Add(controlsgrid)
-
-	stepsgrid, err := gtk.GridNew()
-	if err != nil {
-		log.Fatal("Unable to create sets grid:", err)
-	}
-	stepsgrid.SetOrientation(gtk.ORIENTATION_HORIZONTAL)
-
-	dummybutton, err := gtk.ButtonNewWithLabel("")
-	if err != nil {
-		log.Fatal("Unable to create dummybutton:", err)
-	}
-	stepsgrid.Add(dummybutton)
-
-	pagegrid.Add(stepsgrid)
+	pagegrid.Add(processbox)
 
 	win.Add(pagegrid)
 
