@@ -50,6 +50,16 @@ func Max(in []float64) float64 {
 	return floats.Max(in)
 }
 
+func MaxInt(in []int) int {
+	max := in[0]
+	for _, d := range(in) {
+		if d > max {
+			max = d
+		}
+	}
+	return max
+}
+
 func Histogram(in []float64, nBuckets int) []int {
 	buckets := make([]int, nBuckets)
 	max := Max(in)
@@ -65,6 +75,24 @@ func Histogram(in []float64, nBuckets int) []int {
 	}
 
 	return buckets
+}
+
+func HistogramInts(in []int, buckets []int) []int {
+	ret := make([]int, len(buckets))
+
+	for _, d := range(in) {
+		for  i, b := range(buckets) {
+			if i >= len(ret)-1 {
+				ret[i] += 1
+			}
+			if b > d {
+				ret[i] += 1
+				continue
+			}
+		}
+	}
+
+	return ret
 }
 
 func Mean(in []float64) float64 {
@@ -166,4 +194,40 @@ func EdgeFinder(in []float64, buckets int) []float64 {
 	}
 
 	return ret
+}
+
+func MaxIndexInt(in []int) int {
+	maxindex := 0
+
+	for i, d := range(in) {
+		if d > in[maxindex] {
+			maxindex = i
+		}
+	}
+
+	return maxindex
+}
+
+// I should learn how this is done rather than making something up
+func ClockRecovery(in []float64) []int {
+	risings := make([]int, 0, len(in))
+
+	for i := range(in) {
+		if i >= len(in) - 2 {
+			continue
+		}
+		if in[i] < in[i+1] {
+			risings = append(risings, i)
+		}
+	}
+
+	diffs := make([]int, 0, len(in))
+	for i := range(risings) {
+		if i == 0 {
+			continue
+		}
+		diffs = append(diffs, risings[i] - risings[i-1])
+	}
+
+	return risings // Wrong but tests the gui part
 }

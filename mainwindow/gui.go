@@ -24,6 +24,57 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	pagegrid, _ := gtk.GridNew()
 	pagegrid.SetOrientation(gtk.ORIENTATION_VERTICAL)
 
+	menubar, _ := gtk.MenuBarNew()
+	filemenu, _ := gtk.MenuNew()
+	fileitem, _ := gtk.MenuItemNewWithLabel("File")
+	fileitem.SetSubmenu(filemenu)
+
+	openitem, _ := gtk.MenuItemNewWithLabel("Open")
+	filemenu.Append(openitem)
+
+	quititem, _ := gtk.MenuItemNewWithLabel("Quit")
+	filemenu.Append(quititem)
+
+	viewmenu, _ := gtk.MenuNew()
+	viewitem, _ := gtk.MenuItemNewWithLabel("View")
+	viewitem.SetSubmenu(viewmenu)
+
+	amplitudeitem, _ := gtk.MenuItemNewWithLabel("Amplitude / Time Plot")
+	viewmenu.Append(amplitudeitem)
+
+	iqviewitem, _ := gtk.MenuItemNewWithLabel("I/Q Constelation")
+	viewmenu.Append(iqviewitem)
+
+	frequencypower, _ := gtk.MenuItemNewWithLabel("Frequency / Power Plot")
+	viewmenu.Append(frequencypower)
+
+	waterfallitem, _ := gtk.MenuItemNewWithLabel("Waterfall")
+	viewmenu.Append(waterfallitem)
+
+	helpmenu, _ := gtk.MenuNew()
+	helpitem, _ := gtk.MenuItemNewWithLabel("Help")
+	helpitem.SetSubmenu(helpmenu)
+
+	aboutitem, _ := gtk.MenuItemNewWithLabel("About")
+	aboutitem.Connect("activate", func() {
+		aboutdialog, _ := gtk.AboutDialogNew()
+		aboutdialog.SetAuthors([]string{"Duncan Thomas"})
+		aboutdialog.SetCopyright("(c) Duncan Thomas 2019")
+		aboutdialog.SetLicense("GPL V2")
+		aboutdialog.SetWebsite("https://github.com/Funcan/go_sdr_tool")
+		aboutdialog.SetWebsiteLabel("Github")
+		aboutdialog.SetProgramName("Go SDR Tool")
+		aboutdialog.SetTitle("About")
+		aboutdialog.Show()
+	})
+	helpmenu.Append(aboutitem)
+
+	menubar.Append(fileitem)
+	menubar.Append(viewitem)
+	menubar.Append(helpitem)
+
+	pagegrid.Add(menubar)
+
 	l, _ := gtk.LabelNew("Filename: ")
 
 	loadFileSender := registerSource("load file")
@@ -92,10 +143,12 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	pagegrid.Add(scrollbar)
 
 	zoom := 1
+	var drawclocks []int
 
 	chartarea.Connect("draw", func(da *gtk.DrawingArea, cr *cairo.Context) {
 		if dataPtr != nil {
-			drawHandler(da, cr, *dataPtr, adjustment, zoom, processingSteps)
+			log.Printf("Connect.draw %d", len(drawclocks))
+			drawHandler(da, cr, *dataPtr, adjustment, zoom, processingSteps, drawclocks)
 		}
 	})
 
@@ -176,6 +229,22 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
         })
 	controlsgrid.Add(edgeFinderButton)
 
+	ClkRecoveryButton, _ := gtk.ButtonNewWithLabel("Clock recovery")
+
+	ClkRecoveryButton.Connect("clicked", func() {
+                processingSteps = append(processingSteps, func(in []float64)[]float64 {
+			drawclocks = mathtools.ClockRecovery(in)
+			log.Printf("Clocks set")
+			return in
+                })
+		stepbutton, _ := gtk.ButtonNewWithLabel("clkrec")
+		processbox.Add(stepbutton)
+		log.Printf("clkrec queuing draw")
+                chartarea.QueueDraw()
+		win.ShowAll()
+        })
+	controlsgrid.Add(ClkRecoveryButton)
+
 	pagegrid.Add(controlsgrid)
 	pagegrid.Add(processbox)
 
@@ -187,7 +256,7 @@ func Setup(registerListener func(string, func(interface {})), registerSource fun
 	gtk.Main()
 }
 
-func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustment *gtk.Adjustment, zoom int, processingsteps []func([]float64)[]float64) {
+func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustment *gtk.Adjustment, zoom int, processingsteps []func([]float64)[]float64, clocks []int) {
 	width := da.GetAllocatedWidth()
 	height := da.GetAllocatedHeight()
 
@@ -205,6 +274,18 @@ func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustm
 
 	max := mathtools.Max(data)
 
+	zoom2steps := map[int]int {
+		2: 1,
+		3: 2,
+		4: 5,
+		5: 10,
+		6: 25,
+		7: 75,
+		8: 200,
+		9: 500,
+		10: 1000,
+	}
+
 	cr.SetSourceRGBA(1,0,0,1)
 	cr.SetLineWidth(0.6)
 	if zoom == 1 {
@@ -219,17 +300,6 @@ func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustm
 			}
 		}
 	} else {
-		zoom2steps := map[int]int {
-			2: 1,
-			3: 2,
-			4: 5,
-			5: 10,
-			6: 25,
-			7: 75,
-			8: 200,
-			9: 500,
-			10: 1000,
-		}
 		steps := zoom2steps[zoom]
 
 		for i:=0; i<width; i++ {
@@ -248,4 +318,23 @@ func drawHandler(da *gtk.DrawingArea, cr *cairo.Context, data []float64, adjustm
 		}
 	}
 	cr.Stroke()
+
+	if clocks == nil || len(clocks) == 0 {
+		log.Printf("No clocks")
+		return
+	}
+
+	log.Printf("%d clocks", len(clocks))
+
+	cr.SetSourceRGBA(0,0,1,1)
+	cr.SetLineWidth(1.5)
+	for _, d := range(clocks) {
+		pos := 15
+		_ = d
+		cr.MoveTo(float64(pos), float64(0))
+		cr.LineTo(float64(pos), float64(height))
+	}
+	cr.Stroke()
+
+	log.Printf("Draw finished")
 }
