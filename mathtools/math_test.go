@@ -95,3 +95,156 @@ func TestMin(t *testing.T) {
 		}
 	}
 }
+
+func TestMax(t *testing.T) {
+	var tests = []struct {
+		in []float64
+		expected float64
+	}{
+		{
+			[]float64{1,2,3},
+			3,
+		},
+		{
+			[]float64{-1,2,3},
+			3,
+		},
+		{
+			[]float64{-1,-2,-3},
+			-1,
+		},
+	}
+
+	for _, test := range tests {
+		actual := Max(test.in)
+		if test.expected != actual {
+			t.Errorf("Error: max(%v) expected %f got %f",
+				test.in, test.expected, actual)
+		}
+	}
+}
+
+func TestMean(t *testing.T) {
+	var tests = []struct {
+		in []float64
+		expected float64
+	}{
+		{
+			[]float64{1,2,3},
+			2,
+		},
+		{
+			[]float64{-1,2,5},
+			2,
+		},
+		{
+			[]float64{-1,-2,-3},
+			-2,
+		},
+	}
+
+	for _, test := range tests {
+		actual := Mean(test.in)
+		if test.expected != actual {
+			t.Errorf("Error: mean(%v) expected %f got %f",
+				test.in, test.expected, actual)
+		}
+	}
+}
+
+func TestStdDev(t *testing.T) {
+	var tests = []struct {
+		in []float64
+		expected float64
+	}{
+		{
+			[]float64{1,2,3},
+			1,
+		},
+		{
+			[]float64{-1,2,5},
+			3,
+		},
+		{
+			[]float64{-1,-2,-3},
+			1,
+		},
+	}
+
+	for _, test := range tests {
+		actual := StdDev(test.in)
+		if test.expected != actual {
+			t.Errorf("Error: stddev(%v) expected %f got %f",
+				test.in, test.expected, actual)
+		}
+	}
+}
+
+func slicesFloat64Equal(a []float64, b []float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range(a) {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func TestSlicesFloat64Equal(t *testing.T) {
+	var tests = []struct {
+		a []float64
+		b []float64
+		expected bool
+	}{
+		{
+			[]float64{1,2,3},
+			[]float64{1,2,3},
+			true,
+		},
+		{
+			[]float64{1,2,3},
+			[]float64{3,2,1},
+			false,
+		},
+		{
+			[]float64{1,2,3},
+			[]float64{1,2},
+			false,
+		},
+		{
+			[]float64{1,2},
+			[]float64{1,2,3},
+			false,
+		},
+	}
+	for _, test := range tests {
+		actual := slicesFloat64Equal(test.a, test.b)
+		if test.expected != actual {
+			t.Errorf("Error: slicesFloat64Equal (%v, %v) expected %v got %v", test.a, test.b, test.expected, actual)
+		}
+	}
+}
+
+func TestAbsAroundMean(t *testing.T) {
+	var tests = []struct {
+		in []float64
+		expected []float64
+	}{
+		{
+			[]float64{1,2,3},
+			[]float64{1,0,1},
+		},
+	}
+
+	for _, test := range tests {
+		actual := AbsAroundMean(test.in)
+		if !slicesFloat64Equal(test.expected, actual) {
+			t.Errorf("Error: stddev(%v) expected %v got %v",
+				test.in, test.expected, actual)
+		}
+	}
+}
