@@ -8,8 +8,8 @@ func TestRollingAverage(t *testing.T) {
 	// FIXME: These are the calculated values. They look wrong, which means
 	//        that the function is wrong. Check it.
 	var tests = []struct {
-		in []float64
-		buckets int
+		in       []float64
+		buckets  int
 		expected []float64
 	}{
 		{
@@ -22,7 +22,7 @@ func TestRollingAverage(t *testing.T) {
 	for _, test := range tests {
 		actual := RollingAverage(test.in, test.buckets)
 
-		for i := range(test.in) {
+		for i := range test.in {
 			if test.expected[i] != actual[i] {
 				t.Errorf("Error at index %d expected %f got %f",
 					i, test.expected[i], actual[i])
@@ -33,8 +33,8 @@ func TestRollingAverage(t *testing.T) {
 
 func TestMod(t *testing.T) {
 	var tests = []struct {
-		in int
-		modulo int
+		in       int
+		modulo   int
 		expected int
 	}{
 		{
@@ -70,19 +70,19 @@ func TestMod(t *testing.T) {
 
 func TestMin(t *testing.T) {
 	var tests = []struct {
-		in []float64
+		in       []float64
 		expected float64
 	}{
 		{
-			[]float64{1,2,3},
+			[]float64{1, 2, 3},
 			1,
 		},
 		{
-			[]float64{-1,2,3},
+			[]float64{-1, 2, 3},
 			-1,
 		},
 		{
-			[]float64{-1,-2,-3},
+			[]float64{-1, -2, -3},
 			-3,
 		},
 	}
@@ -98,19 +98,19 @@ func TestMin(t *testing.T) {
 
 func TestMax(t *testing.T) {
 	var tests = []struct {
-		in []float64
+		in       []float64
 		expected float64
 	}{
 		{
-			[]float64{1,2,3},
+			[]float64{1, 2, 3},
 			3,
 		},
 		{
-			[]float64{-1,2,3},
+			[]float64{-1, 2, 3},
 			3,
 		},
 		{
-			[]float64{-1,-2,-3},
+			[]float64{-1, -2, -3},
 			-1,
 		},
 	}
@@ -126,19 +126,19 @@ func TestMax(t *testing.T) {
 
 func TestMean(t *testing.T) {
 	var tests = []struct {
-		in []float64
+		in       []float64
 		expected float64
 	}{
 		{
-			[]float64{1,2,3},
+			[]float64{1, 2, 3},
 			2,
 		},
 		{
-			[]float64{-1,2,5},
+			[]float64{-1, 2, 5},
 			2,
 		},
 		{
-			[]float64{-1,-2,-3},
+			[]float64{-1, -2, -3},
 			-2,
 		},
 	}
@@ -154,19 +154,19 @@ func TestMean(t *testing.T) {
 
 func TestStdDev(t *testing.T) {
 	var tests = []struct {
-		in []float64
+		in       []float64
 		expected float64
 	}{
 		{
-			[]float64{1,2,3},
+			[]float64{1, 2, 3},
 			1,
 		},
 		{
-			[]float64{-1,2,5},
+			[]float64{-1, 2, 5},
 			3,
 		},
 		{
-			[]float64{-1,-2,-3},
+			[]float64{-1, -2, -3},
 			1,
 		},
 	}
@@ -185,7 +185,7 @@ func slicesFloat64Equal(a []float64, b []float64) bool {
 		return false
 	}
 
-	for i := range(a) {
+	for i := range a {
 		if a[i] != b[i] {
 			return false
 		}
@@ -196,28 +196,28 @@ func slicesFloat64Equal(a []float64, b []float64) bool {
 
 func TestSlicesFloat64Equal(t *testing.T) {
 	var tests = []struct {
-		a []float64
-		b []float64
+		a        []float64
+		b        []float64
 		expected bool
 	}{
 		{
-			[]float64{1,2,3},
-			[]float64{1,2,3},
+			[]float64{1, 2, 3},
+			[]float64{1, 2, 3},
 			true,
 		},
 		{
-			[]float64{1,2,3},
-			[]float64{3,2,1},
+			[]float64{1, 2, 3},
+			[]float64{3, 2, 1},
 			false,
 		},
 		{
-			[]float64{1,2,3},
-			[]float64{1,2},
+			[]float64{1, 2, 3},
+			[]float64{1, 2},
 			false,
 		},
 		{
-			[]float64{1,2},
-			[]float64{1,2,3},
+			[]float64{1, 2},
+			[]float64{1, 2, 3},
 			false,
 		},
 	}
@@ -231,12 +231,12 @@ func TestSlicesFloat64Equal(t *testing.T) {
 
 func TestAbsAroundMean(t *testing.T) {
 	var tests = []struct {
-		in []float64
+		in       []float64
 		expected []float64
 	}{
 		{
-			[]float64{1,2,3},
-			[]float64{1,0,1},
+			[]float64{1, 2, 3},
+			[]float64{1, 0, 1},
 		},
 	}
 

@@ -11,15 +11,15 @@ import (
 func RollingAverage(in []float64, points int) []float64 {
 	out := make([]float64, len(in))
 
-	if points % 2 == 0 {
+	if points%2 == 0 {
 		points = points + 1
 	}
 
 	buckets := make([]float64, points)
 
-	for i := range(in) {
-		for j:=0; j<points; j++ {
-			index := Mod(((i+j) - points/2), len(in))
+	for i := range in {
+		for j := 0; j < points; j++ {
+			index := Mod(((i + j) - points/2), len(in))
 			buckets[j] = in[index]
 		}
 		out[i] = Sum(buckets) / float64(points)
@@ -31,7 +31,7 @@ func RollingAverage(in []float64, points int) []float64 {
 // Python style mod, rather than the remainder that go '%' operator provides
 func Mod(d, m int) int {
 	var res int = d % m
-	if ((res < 0 && m > 0) || (res > 0 && m < 0)) {
+	if (res < 0 && m > 0) || (res > 0 && m < 0) {
 		return res + m
 	}
 
@@ -54,7 +54,7 @@ func Histogram(in []float64, nBuckets int) []int {
 	buckets := make([]int, nBuckets)
 	max := Max(in)
 
-	for _, d := range(in) {
+	for _, d := range in {
 		bucket := int(math.Floor(d / (max / float64(nBuckets))))
 		// Max case cases an index-out-of-range depending on floating
 		// point math
@@ -78,7 +78,7 @@ func StdDev(in []float64) float64 {
 // squelch will zero all values less than floor
 func Squelch(in []float64, floor float64) []float64 {
 	ret := make([]float64, len(in))
-	for i, d := range(in) {
+	for i, d := range in {
 		if d > floor {
 			ret[i] = d
 		} else {
@@ -95,7 +95,7 @@ func AbsAroundMean(in []float64) []float64 {
 	ret := make([]float64, len(in))
 	mean := Mean(in)
 
-	for i, d := range(in) {
+	for i, d := range in {
 		if d < mean {
 			ret[i] = mean - d
 		} else {
@@ -110,7 +110,7 @@ func AbsAroundMean(in []float64) []float64 {
 func Denoise(in []float64) []float64 {
 	ret := make([]float64, len(in))
 
-	for i, d := range(in) {
+	for i, d := range in {
 		if len(in)-2 < i {
 			ret[i] = d
 			continue
@@ -120,11 +120,11 @@ func Denoise(in []float64) []float64 {
 			continue
 		}
 		if in[i-1] < d && in[i+1] < d {
-			ret[i] = in[i-1] + in[i+1] / 2
+			ret[i] = in[i-1] + in[i+1]/2
 			continue
 		}
 		if in[i-1] > d && in[i+1] > d {
-			ret[i] = in[i-1] + in[i+1] / 2
+			ret[i] = in[i-1] + in[i+1]/2
 			continue
 		}
 		ret[i] = d
@@ -141,7 +141,7 @@ func EdgeFinder(in []float64, buckets int) []float64 {
 	stddev := StdDev(in)
 
 	high := false
-	for i, d := range(in) {
+	for i, d := range in {
 		if d > stddev {
 			ret[i] = max
 			high = true

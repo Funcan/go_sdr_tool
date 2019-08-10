@@ -39,16 +39,16 @@ func ReadU8(filename string, samplerate int64) (*U8Data, error) {
 	_, err = reader.Read(bytes)
 
 	ret := U8Data{
-		Len:         size / 2,
-		SampleRate:  samplerate,
-		I:           make([]uint8, size/2),
-		J:           make([]uint8, size/2),
-		Real:        make([]float64, size/2),
+		Len:        size / 2,
+		SampleRate: samplerate,
+		I:          make([]uint8, size/2),
+		J:          make([]uint8, size/2),
+		Real:       make([]float64, size/2),
 	}
 
-	for i := int64(0); i < size / 2; i++ {
-		ret.I[i] = uint8FromBuf(bytes, i * 2)
-		ret.J[i] = uint8FromBuf(bytes, i * 2 + 1)
+	for i := int64(0); i < size/2; i++ {
+		ret.I[i] = uint8FromBuf(bytes, i*2)
+		ret.J[i] = uint8FromBuf(bytes, i*2+1)
 
 		ret.Real[i] = math.Sqrt(float64(ret.I[i]) * float64(ret.J[i]))
 	}
@@ -98,17 +98,16 @@ func oldmain() {
 	mean := mathtools.Mean(data.Real)
 	stdDev := mathtools.StdDev(data.Real)
 
-
-	squelched := mathtools.Squelch(data.Real, mean + stdDev)
+	squelched := mathtools.Squelch(data.Real, mean+stdDev)
 	//avg := mathtools.RollingAverage(squelched, 5)
 
-//	for _, d := range(squelched) {
-//		fmt.Printf("%f\n", d)
-//	}
+	//	for _, d := range(squelched) {
+	//		fmt.Printf("%f\n", d)
+	//	}
 
 	hist := mathtools.Histogram(squelched, 100)
 
-	for _, d := range(hist) {
+	for _, d := range hist {
 		fmt.Printf("%d\n", d)
 	}
 }
@@ -133,9 +132,9 @@ func registerListener(event string, f func(e interface{})) {
 func registerSource(event string) func(e interface{}) {
 	return func(e interface{}) {
 		log.Printf("event '%s' -> %T", event, e)
-		for s, funcs := range(listeners) {
+		for s, funcs := range listeners {
 			if s == event {
-				for _, f := range(funcs) {
+				for _, f := range funcs {
 					f(e)
 				}
 			}
